@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d37ca58339f532345aebef578d09169e, type: 3}
+  m_Name: Cockatrice SkewerRecipe
+  m_EditorClassIdentifier: 
+  recipeName: 3
+  resources:
+  - {fileID: 11400000, guid: e8db3178932882e4ba16aa93c69f89dd, type: 2}
+  - {fileID: 11400000, guid: 16cd0681bfd2c174f9e608a72d887b09, type: 2}
+  - {fileID: 11400000, guid: f046dd24f484c1048b553ccc60acf210, type: 2}
+  resourceCounts: 020000000600000004000000
+  resourcesOpen: 000000
+  food: {fileID: 11400000, guid: dfeadd2a061ad864b9944f58335e2fc0, type: 2}
