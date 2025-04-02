@@ -33,8 +33,8 @@ public class GameInput : MonoBehaviour
         moveobjPos = moveObject.transform.position;
         playerInputAction = new PlayerInputAction();
         GameInputEnable();
+        
         playerInputAction.PlayerAction.MouseLeft.performed += OnMouseLeft;
-
         playerInputAction.PlayerAction.MapScroll.performed += MapScroll_performed;
         playerInputAction.PlayerAction.MapScroll.canceled += MapScroll_canceled;
     }
@@ -53,9 +53,8 @@ public class GameInput : MonoBehaviour
     private void OnDestroy()
     {
         playerInputAction.PlayerAction.MouseLeft.performed -= OnMouseLeft;
-
-        playerInputAction.PlayerAction.MapScroll.started += MapScroll_performed;
-        playerInputAction.PlayerAction.MapScroll.canceled += MapScroll_canceled;
+        playerInputAction.PlayerAction.MapScroll.started -= MapScroll_performed;
+        playerInputAction.PlayerAction.MapScroll.canceled -= MapScroll_canceled;
     }
 
     public void MapScrollEvent(bool value)
