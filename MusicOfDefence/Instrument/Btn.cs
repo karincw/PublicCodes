@@ -108,98 +108,68 @@ public class Btn : Poolable, IButton
 
     public void ImageReRender()
     {
-        switch (myState)
-        {
-            case BtnState.Basic:
-                _spriteRenderer.sprite = btnTypes[0];
-
-                break;
-            case BtnState.Clicked:
-                _spriteRenderer.sprite = btnTypes[1];
-
-                break;
-            case BtnState.BasicActive:
-                _spriteRenderer.sprite = btnTypes[2];
-
-                break;
-            case BtnState.ClickedActive:
-                _spriteRenderer.sprite = btnTypes[3];
-
-                break;
-            case BtnState.Return:
-                _spriteRenderer.sprite = btnTypes[4];
-
-                break;
-        }
+        _spriteRenderer.sprite = btnTypes[(int)myState];
     }
-
+    
     public IEnumerator MyTick()
     {
         if (_instrumentManager == null)
             _instrumentManager = transform.GetComponentInParent<InstrumentManager>();
-        if (myState == BtnState.Basic)
+
+        switch (myState)
         {
-            myState = BtnState.BasicActive;
-            _spriteRenderer.sprite = btnTypes[2];
+            case BtnState.Basic:
+                SetState(BtnState.BasicActive, btnTypes[2]);
+                break;
+
+            case BtnState.Clicked:
+                SetState(BtnState.ClickedActive, btnTypes[3]);
+                HandleNoteSummon();
+                transform.DOScale(_originSize * 0.95f, 0.15f).SetEase(Ease.Linear);
+                break;
+
+            case BtnState.Return:
+                HandleNoteSummon();
+                RestartTickCoroutine();
+                break;
         }
-        else if (myState == BtnState.Clicked)
-        {
-            myState = BtnState.ClickedActive;
-            _spriteRenderer.sprite = btnTypes[3];
-            _instrumentManager.attack?.Invoke(tone);
-
-            particleLen = _instrumentManager.instrument.SoundLength;
-            if (particleLen == 10)
-            {
-                GameObject summonNote = GameManager.Instance.PoolManager.Spawn($"DrumNote{(tone + 1)}");
-                summonNote.transform.position = transform.position + new Vector3(0, 0.75f);
-            }
-            else
-            {
-                GameObject summonNote = GameManager.Instance.PoolManager.Spawn($"BasicNote{(tone + 1)}");
-                summonNote.transform.position = transform.position + new Vector3(0, 0.75f);
-            }
-
-            transform.DOScale(_originSize * 0.95f, 0.15f).SetEase(Ease.Linear);
-
-        }
-        else if (myState == BtnState.Return)
-        {
-            _instrumentManager.attack?.Invoke(tone);
-
-            particleLen = _instrumentManager.instrument.SoundLength;
-            if (particleLen == 10)
-            {
-                GameObject summonNote = GameManager.Instance.PoolManager.Spawn("DrumNote" + (tone + 1).ToString());
-                summonNote.transform.position = transform.position + new Vector3(0, 0.75f);
-            }
-            else
-            {
-                GameObject summonNote = GameManager.Instance.PoolManager.Spawn("BasicNote" + (tone + 1).ToString());
-                summonNote.transform.position = transform.position + new Vector3(0, 0.75f);
-            }
-
-
-            _instrumentManager.StopCoroutine("StartTick");
-            _instrumentManager.StartCoroutine("StartTick");
-        }
-
 
         yield return new WaitForSeconds(_tickSpeed);
 
+        switch (myState)
+        {
+            case BtnState.BasicActive:
+                SetState(BtnState.Basic, btnTypes[0]);
+                break;
 
-        if (myState == BtnState.BasicActive)
-        {
-            myState = BtnState.Basic;
-            _spriteRenderer.sprite = btnTypes[0];
-        }
-        else if (myState == BtnState.ClickedActive)
-        {
-            myState = BtnState.Clicked;
-            _spriteRenderer.sprite = btnTypes[1];
+            case BtnState.ClickedActive:
+                SetState(BtnState.Clicked, btnTypes[1]);
+                break;
         }
 
         transform.DOScale(_originSize, 0.15f).SetEase(Ease.Linear);
+    }
+
+    private void SetState(BtnState newState, Sprite newSprite)
+    {
+        myState = newState;
+        _spriteRenderer.sprite = newSprite;
+    }
+
+    private void HandleNoteSummon()
+    {
+        _instrumentManager.attack?.Invoke(tone);
+        particleLen = _instrumentManager.instrument.SoundLength;
+
+        string noteType = (particleLen == 10) ? "DrumNote" : "BasicNote";
+        GameObject summonNote = GameManager.Instance.PoolManager.Spawn($"{noteType}{tone + 1}");
+        summonNote.transform.position = transform.position + new Vector3(0, 0.75f);
+    }
+
+    private void RestartTickCoroutine()
+    {
+        _instrumentManager.StopCoroutine("StartTick");
+        _instrumentManager.StartCoroutine("StartTick");
     }
 
     public void ToneUp()
